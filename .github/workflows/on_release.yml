@@ -16,14 +16,20 @@ jobs:
     name: Create Release 📢
     runs-on: ubuntu-latest
     steps:
-      - name: Download Tarball 📥
+      - name: Download x86_64 Tarball 📥
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
-          name: tarball
+          name: tarball-x86_64
+
+      - name: Download aarch64 Tarball 📥
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: tarball-aarch64
 
       - name: Generate Checksums 🔑
         run: |
           sha256sum nixos.wsl > nixos.wsl.sha256
+          sha256sum nixos-arm64.wsl > nixos-arm64.wsl.sha256
 
       - name: Attach to Release 📎
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2
@@ -31,5 +37,7 @@ jobs:
           files: |
             nixos.wsl
             nixos.wsl.sha256
+            nixos-arm64.wsl
+            nixos-arm64.wsl.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

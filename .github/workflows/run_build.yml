@@ -5,8 +5,18 @@ on:
 
 jobs:
   tar:
-    name: Tarball 🛠️
+    name: Tarball 🛠️ (${{ matrix.arch }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            config: default
+            filename: nixos.wsl
+          - arch: aarch64
+            config: default_aarch64
+            filename: nixos-arm64.wsl
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -21,16 +31,16 @@ jobs:
         id: version
 
       - name: Summary Headline 📝
-        run: echo '## NixOS-WSL ${{ steps.version.outputs.version }}' >> $GITHUB_STEP_SUMMARY
+        run: echo '## NixOS-WSL ${{ steps.version.outputs.version }} (${{ matrix.arch }})' >> $GITHUB_STEP_SUMMARY
 
       - name: Build Tarball 🛠️
         uses: ./.github/actions/build-wsl-tarball
         with:
-          config: default
-          filename: nixos.wsl
+          config: ${{ matrix.config }}
+          filename: ${{ matrix.filename }}
 
       - name: Upload Tarball 📤
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: tarball
-          path: nixos.wsl
+          name: tarball-${{ matrix.arch }}
+          path: ${{ matrix.filename }}
