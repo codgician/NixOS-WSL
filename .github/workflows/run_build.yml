@@ -14,7 +14,7 @@ jobs:
           - arch: x86_64
             config: default
             filename: nixos.wsl
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
           - arch: aarch64
             config: default_aarch64
             filename: nixos-arm64.wsl
