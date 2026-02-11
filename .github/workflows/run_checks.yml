@@ -3,12 +3,25 @@ name: Checks
 on:
   workflow_call: {}
 
+permissions:
+  contents: read
+
 jobs:
-  prepare:
-    name: Find Checks 🔍
+  checks:
+    name: Flake Check ❄️ (x86_64)
+    strategy:
+      fail-fast: false
+      matrix:
+        # Keep in sync with flake.nix outputs.checks.
+        check: &checks_list
+          - nixpkgs-fmt
+          - nixpkgs-input
+          - options-doc
+          - rustfmt
+          - side-effects
+          - username
+          - test-native-utils
     runs-on: ubuntu-latest
-    outputs:
-      checks: ${{ steps.checks.outputs.checks }}
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -18,20 +31,17 @@ jobs:
       - name: Install Nix ❄️
         uses: ./.github/actions/install-nix
 
-      - name: Find Checks 🔍
-        id: checks
+      - name: Run Check 📋
         run: |
-          nix-instantiate --json --eval --strict -E 'with builtins; attrNames (getFlake (toString ./.)).checks.${currentSystem}' | perl -pe 's|(.*)|checks=\1|' >>$GITHUB_OUTPUT
+          nix build -L --impure --expr "with builtins; (getFlake (toString ./.)).checks.\${currentSystem}.${{ matrix.check }}"
 
-  checks:
-    name: Flake Check ❄️
-    needs:
-      - prepare
+  checks-aarch64:
+    name: Flake Check ❄️ (aarch64)
     strategy:
       fail-fast: false
       matrix:
-        check: ${{ fromJSON(needs.prepare.outputs.checks) }}
-    runs-on: ubuntu-latest
+        check: *checks_list
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
