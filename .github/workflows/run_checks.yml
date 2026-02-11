@@ -12,6 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Keep in sync with flake.nix outputs.checks.
         check: &checks_list
           - nixpkgs-fmt
           - nixpkgs-input
