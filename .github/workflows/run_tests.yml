@@ -41,7 +41,7 @@ jobs:
       - name: Download Tarball 📥
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
-          name: tarball
+          name: tarball-x86_64
 
       - name: Setup WSL 🐧
         run: |
