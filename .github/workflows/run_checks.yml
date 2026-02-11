@@ -44,3 +44,19 @@ jobs:
       - name: Run Check 📋
         run: |
           nix build -L --impure --expr "with builtins; (getFlake (toString ./.)).checks.\${currentSystem}.${{ matrix.check }}"
+
+  checks-aarch64:
+    name: Flake Check ❄️ (aarch64)
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
+
+      - name: Install Nix ❄️
+        uses: ./.github/actions/install-nix
+
+      - name: Run Check 📋
+        run: |
+          nix flake check --impure
