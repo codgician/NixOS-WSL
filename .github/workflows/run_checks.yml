@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        check:
+        check: &checks_list
           - nixpkgs-fmt
           - nixpkgs-input
           - options-doc
@@ -39,14 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        check:
-          - nixpkgs-fmt
-          - nixpkgs-input
-          - options-doc
-          - rustfmt
-          - side-effects
-          - username
-          - test-native-utils
+        check: *checks_list
     runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
