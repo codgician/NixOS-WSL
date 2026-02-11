@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   prepare:
-    name: Find Checks 🔍
+    name: Find Checks 🔍 (x86_64)
     runs-on: ubuntu-latest
     outputs:
       checks: ${{ steps.checks.outputs.checks }}
@@ -27,7 +27,7 @@ jobs:
           nix-instantiate --json --eval --strict -E 'with builtins; attrNames (getFlake (toString ./.)).checks.${currentSystem}' | perl -pe 's|(.*)|checks=\1|' >>$GITHUB_OUTPUT
 
   checks:
-    name: Flake Check ❄️
+    name: Flake Check ❄️ (x86_64)
     needs:
       - prepare
     strategy:
