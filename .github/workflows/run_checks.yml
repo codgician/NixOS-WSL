@@ -45,8 +45,33 @@ jobs:
         run: |
           nix build -L --impure --expr "with builtins; (getFlake (toString ./.)).checks.\${currentSystem}.${{ matrix.check }}"
 
+  prepare-aarch64:
+    name: Find Checks 🔍 (aarch64)
+    runs-on: ubuntu-24.04-arm
+    outputs:
+      checks: ${{ steps.checks.outputs.checks }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
+
+      - name: Install Nix ❄️
+        uses: ./.github/actions/install-nix
+
+      - name: Find Checks 🔍
+        id: checks
+        run: |
+          nix-instantiate --json --eval --strict -E 'with builtins; attrNames (getFlake (toString ./.)).checks.${currentSystem}' | perl -pe 's|(.*)|checks=\1|' >>$GITHUB_OUTPUT
+
   checks-aarch64:
     name: Flake Check ❄️ (aarch64)
+    needs:
+      - prepare-aarch64
+    strategy:
+      fail-fast: false
+      matrix:
+        check: ${{ fromJSON(needs.prepare-aarch64.outputs.checks) }}
     runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
@@ -59,4 +84,4 @@ jobs:
 
       - name: Run Check 📋
         run: |
-          nix flake check --impure
+          nix build -L --impure --expr "with builtins; (getFlake (toString ./.)).checks.\${currentSystem}.${{ matrix.check }}"
