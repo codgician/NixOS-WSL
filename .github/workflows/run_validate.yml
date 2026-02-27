@@ -5,8 +5,17 @@ on:
 
 jobs:
   validate:
-    name: Validate Tarball 🩺
-    runs-on: ubuntu-latest
+    name: Validate Tarball (${{ matrix.system }}) 🩺
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        include:
+          - system: x86_64
+            artifact: tarball-x86_64
+            filename: nixos.wsl
+          - system: aarch64
+            artifact: tarball-aarch64
+            filename: nixos.aarch64.wsl
     steps:
       - name: Checkout WSL Repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -22,9 +31,9 @@ jobs:
       - name: Download Tarball 📥
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
-          name: tarball
+          name: ${{ matrix.artifact }}
 
       - name: Validate Tarball 🩺
         shell: bash
         run: |
-          python3 distributions/validate-modern.py --tar nixos.wsl
+          python3 distributions/validate-modern.py --tar ${{ matrix.filename }}
